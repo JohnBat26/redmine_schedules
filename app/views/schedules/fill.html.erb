@@ -41,7 +41,7 @@
                                     <input type="hidden" value="<%= hours %>" />
                                 </td>
                             <% end %>
-                            <td class="fill"><%= text_field "fill_total", "hours", :size => 3, :value => "", :name => "fill_total[#{user_id}]" %></td>
+                            <td class="fill"><%= text_field "fill_total", "hours", :size => 3, :value => "",:required => true, :name => "fill_total[#{user_id}]" %></td>
                         </tr>
                     <% end %>
                 <% end %>
