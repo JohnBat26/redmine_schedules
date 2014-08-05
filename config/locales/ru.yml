@@ -38,3 +38,4 @@ ru:
   button_schedules_fill: "Заполнить расписание"
   button_save_next: "Сохранить и редактировать следующую неделю"
   label_schedules_groups: "Расписания групп"
+  firstly_fill_availability_by_default: "Сначала заполните доступность по умолчанию"

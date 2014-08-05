@@ -9,7 +9,7 @@
 <h2>
 
   <% if @group %>
-      <%= l(:label_user_schedule, link_to_group(@group)).html_safe unless @group.nil? %>
+      <%= l(:label_user_schedule, @group.name).html_safe unless @group.nil? %>
   <% else %>
       <%= l(:label_user_schedule, link_to_user(@user)).html_safe unless @user.nil? %>
       <%= l(:label_project_schedule) unless @project.nil? %>

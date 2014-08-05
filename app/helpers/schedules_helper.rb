@@ -272,4 +272,6 @@ module SchedulesHelper
       deny_access unless User.current.allowed_to?(:view_schedules, @project, :global => true)
   end
 
+
+
 end

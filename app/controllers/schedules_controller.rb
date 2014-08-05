@@ -258,57 +258,62 @@ class SchedulesController < ApplicationController
   def fill_entries
     if request.post?
 
-      # Get the defaults for the users we want to fill time for
-      params[:fill_total].delete_if { |user_id, fill_total| fill_total.to_f == 0 }
-      defaults = get_defaults(params[:fill_total].collect { |user_id, fill_total| user_id.to_i }).index_by { |default| default.user_id }
+      if  params[:fill_total]
 
-      # Fill the schedule of each specified user
-      params[:fill_total].each do |user_id, fill_total|
+        # Get the defaults for the users we want to fill time for
+        params[:fill_total].delete_if { |user_id, fill_total| fill_total.to_f == 0 }
+        defaults = get_defaults(params[:fill_total].collect { |user_id, fill_total| user_id.to_i }).index_by { |default| default.user_id }
 
-        # Prepare variables for looping
-        hours_remaining = fill_total.to_f
-        user_id = user_id.to_i
-        default = defaults[user_id].weekday_hours
-        date_index = @date
+        # Fill the schedule of each specified user
+        params[:fill_total].each do |user_id, fill_total|
 
-        # Iterate through days until we've filled up enough
-        while hours_remaining > 0
-          fill_hours = params[:fill_entry][user_id.to_s][date_index.wday.to_s].to_f
-          if fill_hours > 0 && default[date_index.wday] > 0
+          # Prepare variables for looping
+          hours_remaining = fill_total.to_f
+          user_id = user_id.to_i
+          default = defaults[user_id].weekday_hours
+          date_index = @date
 
-            # Find entries for this day
-            restrictions = "date = '#{date_index}' AND user_id = #{user_id}"
-            project_entry = ScheduleEntry.find(:first, :conditions => restrictions + " AND project_id = #{@project.id}")
-            other_project_hours = ScheduleEntry.sum(:hours, :conditions => restrictions + " AND project_id <> #{@project.id}")
-            closed_hours = ScheduleClosedEntry.sum(:hours, :conditions => restrictions)
+          # Iterate through days until we've filled up enough
+          while hours_remaining > 0
+            fill_hours = params[:fill_entry][user_id.to_s][date_index.wday.to_s].to_f
+            if fill_hours > 0 && default[date_index.wday] > 0
 
-            # Determine the number of hours available
-            available_hours = default[date_index.wday]
-            available_hours -= closed_hours
-            available_hours -= other_project_hours
-            available_hours -= project_entry.hours unless project_entry.nil?
-            available_hours = [available_hours, fill_hours, hours_remaining].min
-            available_hours = 0 if date_index.holiday?($holiday_locale, :observed)
+              # Find entries for this day
+              restrictions = "date = '#{date_index}' AND user_id = #{user_id}"
+              project_entry = ScheduleEntry.find(:first, :conditions => restrictions + " AND project_id = #{@project.id}")
+              other_project_hours = ScheduleEntry.sum(:hours, :conditions => restrictions + " AND project_id <> #{@project.id}")
+              closed_hours = ScheduleClosedEntry.sum(:hours, :conditions => restrictions)
 
-            # Create an entry if we're adding time to this day
-            if available_hours > 0
-              new_entry = ScheduleEntry.new
-              new_entry.project_id = @project.id
-              new_entry.user_id = user_id
-              new_entry.date = date_index
-              new_entry.hours = available_hours
-              new_entry.hours += project_entry.hours unless project_entry.nil?
-              save_entry(new_entry, project_entry, @project.id)
-              hours_remaining -= available_hours
+              # Determine the number of hours available
+              available_hours = default[date_index.wday]
+              available_hours -= closed_hours
+              available_hours -= other_project_hours
+              available_hours -= project_entry.hours unless project_entry.nil?
+              available_hours = [available_hours, fill_hours, hours_remaining].min
+              available_hours = 0 if date_index.holiday?($holiday_locale, :observed)
+
+              # Create an entry if we're adding time to this day
+              if available_hours > 0
+                new_entry = ScheduleEntry.new
+                new_entry.project_id = @project.id
+                new_entry.user_id = user_id
+                new_entry.date = date_index
+                new_entry.hours = available_hours
+                new_entry.hours += project_entry.hours unless project_entry.nil?
+                save_entry(new_entry, project_entry, @project.id)
+                hours_remaining -= available_hours
+              end
             end
+            date_index += 1
           end
-          date_index += 1
         end
-      end
 
-      # Inform the user that the update was successful
-      flash[:notice] = l(:notice_successful_update)
-      redirect_to({:action => 'index', :project_id => @project.id})
+        # Inform the user that the update was successful
+        flash[:notice] = l(:notice_successful_update)
+        redirect_to({:action => 'index', :project_id => @project.id})
+      else
+        flash[:warning] = l(:firstly_fill_availability_by_default)
+      end
     end
   end
 
