@@ -8,6 +8,15 @@
         <br/>
     <% end %>
 <% end %>
+
+<% if !@groups.nil? && !@groups.empty?%>
+    <h3><%= l(:label_schedules_groups) %></h3>
+    <% @groups.each do |group| %>
+        <%= link_to group, :controller => 'schedules', :action => 'index', :group_id => group.id %>
+        <br/>
+    <% end %>
+<% end %>
+
 <% if !@users.nil? && !@users.empty? && @user.nil? %>
     <h3><%= l(:label_schedules_users) %></h3>
     <% @users.each do |user| %>

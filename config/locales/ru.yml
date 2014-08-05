@@ -14,6 +14,7 @@ ru:
   label_schedules_fill_week_header: "Максимальные количество часов выделять в день, при наличии"
   label_schedules_fill_total_header: "Общее количество часов для заполнения"
   label_user_schedule: "Расписание для %{value}"
+
   label_project_schedule: "Расписание"
   label_schedules_available: "Доступен"
   label_schedules_unavailable: "Недоступен"
@@ -36,3 +37,4 @@ ru:
   button_schedules_default_edit: "Изменить доступность по умолчанию"
   button_schedules_fill: "Заполнить расписание"
   button_save_next: "Сохранить и редактировать следующую неделю"
+  label_schedules_groups: "Расписания групп"
